@@ -19,6 +19,8 @@ Management suspects that some employees may be using TOR browsers to bypass netw
 - **Check `DeviceFileEvents`** for any `tor(.exe)` or `firefox(.exe)` file events.
 - **Check `DeviceProcessEvents`** for any signs of installation or usage.
 - **Check `DeviceNetworkEvents`** for any signs of outgoing connections over known TOR ports.
+- 
+ <img width="1024" height="1536" alt="ChatGPT Image Mar 29, 2026, 05_23_35 PM" src="https://github.com/user-attachments/assets/9ae3d81a-9839-4fcb-bdea-62954bd253eb" />
 
 ---
 
