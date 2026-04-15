@@ -26,7 +26,7 @@ The attacker originated from IP `205.147.16.190` (Netherlands), created hidden i
   - [Phase 7: Correlation & Mitigation](#phase-7-correlation--mitigation)
 - [3. Summary of Findings](#3-summary-of-findings)
 - [4. Recommendations & Lessons Learned](#4-recommendations--lessons-learned)
-- [KQL Queries (Standalone)](#kql-queries-standalone)
+- [KQL Queries ](#kql-queries)
 - [Timeline](#timeline)
 
 ---
