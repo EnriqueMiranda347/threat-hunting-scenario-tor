@@ -172,7 +172,7 @@ Rapid correlation between SigninLogs, CloudAppEvents, and EmailEvents is critica
 ---
 
 
-#### KQL Queries 
+## KQL Queries 
 All queries combined for easy copy-paste into Microsoft Sentinel or Defender:
 ```kql
 // PROJECT SCATTERED SPIDER - ALL HUNT QUERIES
