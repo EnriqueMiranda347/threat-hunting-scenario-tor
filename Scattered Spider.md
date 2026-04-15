@@ -101,7 +101,7 @@ SigninLogs
 
 ---
 
-Phase 5: Persistence & Evasion
+## Phase 5: Persistence & Evasion
 
 Evidence: The attacker created a hidden rule named . to move emails containing keywords like "invoice" or "wire" to hidden folders and applied StopProcessRules.
 
@@ -144,7 +144,7 @@ SigninLogs
 
 ---
 
-3. Summary of Findings
+## 3. Summary of Findings
 
 Threat Actor: Scattered Spider (UNC3944 / Octo Tempest)
 Initial Vector: Likely InfoStealer (Credential theft) followed by MFA Fatigue (Push Bombing)
@@ -153,7 +153,7 @@ Containment Status: Account Disabled (Immediate containment performed)
 
 ---
 
-4. Recommendations & Lessons Learned
+## 4. Recommendations & Lessons Learned
 Immediate Recommendations
 
 Enforce Number Matching or Passwordless authentication (FIDO2 / Passkeys) to defeat MFA Fatigue.
