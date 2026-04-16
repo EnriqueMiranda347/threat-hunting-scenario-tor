@@ -44,6 +44,7 @@ The attack originated from anonymized infrastructure in the **Netherlands** and 
 ### Phase 1: Identification of Compromised Identity
 
 **Discovery:** Initial investigation into suspicious email patterns identified `m.smith@lognpacific.org` as the primary point of compromise.
+<img width="926" height="739" alt="image" src="https://github.com/user-attachments/assets/c8862086-f918-4d8a-9b85-bea872b538b0" />
 
 ```kql
 // Identifying the compromised account
@@ -58,6 +59,8 @@ EmailEvents
 ## Phase 2: Attacker Geo-Location & Infrastructure
 
 Evidence: The attacker utilized IP 205.147.16.190 originating from the Netherlands (NL).
+<img width="795" height="702" alt="image" src="https://github.com/user-attachments/assets/eae6a594-ea01-4d34-989b-dc5d22432e2b" />
+
 
 Attacker Source and Geo-Origin
 ```kql
@@ -74,13 +77,16 @@ SigninLogs
 ## Phase 3: The MFA Fatigue Attack
 
 Evidence: The logs show a "Push Spam" or MFA Fatigue attempt. The user initially denied the prompts (Error 50074) before eventually approving. Fatigue intensity recorded at 3 failed attempts.
+<img width="752" height="679" alt="image" src="https://github.com/user-attachments/assets/ad87c7e3-12f1-472e-8aa2-760b17869263" />
+<img width="810" height="469" alt="image" src="https://github.com/user-attachments/assets/2e75ebb1-dc99-4a5b-b676-a2de64f20155" />
+
 
 MFA Error Code 50074 and Fatigue Intensity Count
 ```kql
 SigninLogs
 | where TimeGenerated > todatetime('2026-02-25T21:59:52.7988431Z')
 | where IPAddress == "205.147.16.190"
-| where Identity == "Mark Smith" and ResultType == "50074" // MFA Challenged/Denied
+| where Identity == "Mark Smith" and ResultType == "50074" 
 | summarize FatigueIntensity = count()
 ```
 
@@ -89,6 +95,8 @@ SigninLogs
 ## Phase 4: Attacker Device Fingerprint
 
 Evidence: The actor utilized One Outlook Web via a Linux operating system running Firefox 147.0.
+<img width="966" height="437" alt="image" src="https://github.com/user-attachments/assets/016a7ff1-9d8c-4769-9572-317849c8e29d" />
+
 
 App, OS, and Browser Version
 ```kql
@@ -104,6 +112,8 @@ SigninLogs
 ## Phase 5: Persistence & Evasion
 
 Evidence: The attacker created a hidden rule named . to move emails containing keywords like "invoice" or "wire" to hidden folders and applied StopProcessRules.
+<img width="1299" height="623" alt="image" src="https://github.com/user-attachments/assets/8e5e061c-774f-44c9-9272-ac3815548fb1" />
+
 
 Post-Auth Actions and Malicious Rule Details
 ```kql 
@@ -119,13 +129,16 @@ CloudAppEvents
 
 ## Phase 6: Targeted BEC Campaign
 Evidence: The actor sent an internal phishing email to j.reynolds@lognpacific.org regarding fraudulent payments.
+<img width="1259" height="622" alt="image" src="https://github.com/user-attachments/assets/ffe4bfe9-e7ec-45f3-b659-f45c7638b12f" />
+
+
 
 BEC Target and Email Direction
 ```kql
 EmailEvents
 | where TimeGenerated between (datetime('2026-02-25T21:56:24Z') .. datetime('2026-02-25T22:10:10Z'))
-| where SenderFromAddress == "m.smith@lognpacific.org"
-| project TimeGenerated, EmailDirection, RecipientEmailAddress, Subject, DeliveryAction
+| where DeliveryAction == "Delivered"
+| project TimeGenerated, DeliveryAction, EmailDirection, RecipientEmailAddress, SenderFromAddress, Subject, To, Cc, RecipientDomain, SenderIPv4
 ```
 
 ---
@@ -133,6 +146,9 @@ EmailEvents
 ## Phase 7: Correlation & Mitigation
 
 Evidence: The session was correlated via ID 00225cfa-a0ff-fb46-a079-5d152fcdf72a. Conditional Access was notApplied, facilitating the breach.
+<img width="826" height="426" alt="image" src="https://github.com/user-attachments/assets/b0c48573-bd0f-439b-9cff-5be2432a928e" />
+
+
 
 SharePoint Access and Correlation
 ```kql
@@ -175,16 +191,16 @@ Rapid correlation between SigninLogs, CloudAppEvents, and EmailEvents is critica
 ## KQL Queries 
 All queries combined for easy copy-paste into Microsoft Sentinel or Defender:
 ```kql
-// PROJECT SCATTERED SPIDER - ALL HUNT QUERIES
 
 
-// Compromised Account
+
+//Compromised Account
 EmailEvents
 | where TimeGenerated between (datetime(2026-02-25T21:00:00) .. datetime(2026-02-26T23:00:00))
 | where RecipientEmailAddress contains "m.smith"
 | order by TimeGenerated desc
 
-// Attacker IP and Geo
+//Attacker IP and Geo
 SigninLogs
 | where TimeGenerated between (datetime(2026-02-25T21:00:00) .. datetime(2026-02-26T23:00:00))
 | where ResultSignature == "SUCCESS" and Identity == "Mark Smith"
@@ -192,21 +208,21 @@ SigninLogs
 | project TimeGenerated, Location, IPAddress, ResultSignature
 | order by TimeGenerated desc
 
-// MFA Fatigue
+//MFA Fatigue
 SigninLogs
 | where TimeGenerated > todatetime('2026-02-25T21:59:52.7988431Z')
 | where IPAddress == "205.147.16.190"
 | where Identity == "Mark Smith" and ResultType == "50074"
 | summarize FatigueIntensity = count()
 
-// Device Fingerprint
+//Device Fingerprint
 SigninLogs
 | where TimeGenerated between (datetime(2026-02-25T13:00:00) .. datetime(2026-02-26T21:00:00))
 | where Identity == "Mark Smith" and IPAddress == "205.147.16.190"
 | project TimeGenerated, AppDisplayName, DeviceDetail.operatingSystem, DeviceDetail.browser
 | order by TimeGenerated desc
 
-// Malicious Inbox Rule
+//Malicious Inbox Rule
 CloudAppEvents
 | where TimeGenerated between (datetime(2026-02-25T13:00:00) .. datetime(2026-02-26T21:00:00))
 | where IPAddress == "205.147.16.190"
@@ -214,13 +230,13 @@ CloudAppEvents
 | project TimeGenerated, ActionType, AccountDisplayName, RawEventData.Parameters
 | order by TimeGenerated asc
 
-// BEC Email
+//BEC Email
 EmailEvents
 | where TimeGenerated between (datetime('2026-02-25T21:56:24Z') .. datetime('2026-02-25T22:10:10Z'))
 | where SenderFromAddress == "m.smith@lognpacific.org"
 | project TimeGenerated, EmailDirection, RecipientEmailAddress, Subject, DeliveryAction
 
-// Session Correlation
+//Session Correlation
 SigninLogs
 | where TimeGenerated between (datetime('2026-02-25T21:56:24Z') .. datetime('2026-02-25T22:10:10Z'))
 | where IPAddress == "205.147.16.190"
